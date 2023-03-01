@@ -1,6 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
-import { getAccessKeylist } from './lib/aws'
+import { Controller, Get, Req, Res, Query } from '@nestjs/common';
+import { AppService, QueryType } from './app.service';
 
 @Controller()
 export class AppController {
@@ -11,8 +10,11 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get("/lists")
-  async listAWSIAM(): Promise<any> {
-    return await getAccessKeylist()
+  @Get("/AccessKeylist")
+  async listAWSIAM(@Query() q: QueryType): Promise<any> {
+    if (q?.period && !Number(q?.period)) {
+      return "period 값은 숫자만 입력해야 합니다."
+    }
+    return await this.appService.getAWSOldAccesskey(q)
   }
 }
